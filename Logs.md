@@ -1,9 +1,29 @@
-28/04/2025 - Basic Setup Frontend and Backend
+# Project Progress Timeline
 
-29/04/2025 - UI design and backend setup
+## 28/04/2025
+**Basic Setup**
+- Frontend setup  
+- Backend setup  
 
-30/04/2025 - Harsh -> login setup, register setup, Spring security
-             Mohit -> Home page frontend
+## 29/04/2025
+**UI Design and Backend Setup**
+- UI design  
+- Backend enhancements  
 
-01/05/2025 - Harsh -> Spring security, OAuth setup, Database setup
-             Mohit -> Home page frontend
+## 30/04/2025
+**Harsh**
+- Login setup  
+- Register setup  
+- Spring Security integration  
+
+**Mohit**
+- Home page frontend development  
+
+## 01/05/2025
+**Harsh**
+- Spring Security refinement  
+- OAuth setup  
+- Database setup  
+
+**Mohit**
+- Continued Home page frontend work  
