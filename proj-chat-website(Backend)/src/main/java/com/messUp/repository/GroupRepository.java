@@ -1,0 +1,5 @@
+package com.messUp.repository;
+
+public interface GroupRepository {
+
+}
