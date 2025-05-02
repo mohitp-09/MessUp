@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-// import './auth.css'; 
+import './auth.css'; 
 export default function Auth() {
   const containerRef = useRef(null);
 
@@ -15,8 +15,8 @@ export default function Auth() {
     signInButton.addEventListener('click', () => {
       container.classList.remove('right-panel-active');
     });
-
-    // Clean up
+`
+    // Clean up`
     return () => {
       signUpButton.removeEventListener('click', () => {});
       signInButton.removeEventListener('click', () => {});
