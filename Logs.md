@@ -26,4 +26,11 @@
 - Database setup  
 
 **Mohit**
-- Continued Home page frontend work  
+- Continued Home page frontend work
+
+## 02/04/2025
+**Harsh**
+- OAuth implemented and tested.
+
+**Mohit**
+- Worked on login and SignUp Page
