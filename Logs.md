@@ -34,3 +34,7 @@
 
 **Mohit**
 - Worked on login and SignUp Page
+
+## 03/04/2025
+**Harsh**
+- WebSocket setup(Backend)
