@@ -1,0 +1,107 @@
+package com.messUp.controller;
+
+import com.messUp.DTO.CreateGroupDTO;
+import com.messUp.DTO.GroupMessageDTO;
+import com.messUp.entity.Group;
+import com.messUp.entity.GroupMember;
+import com.messUp.entity.GroupMessage;
+import com.messUp.entity.User;
+import com.messUp.repository.GroupMemberRepository;
+import com.messUp.repository.GroupMessageRepository;
+import com.messUp.repository.GroupRepository;
+import com.messUp.repository.UserRepository;
+import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+@Controller
+public class GroupChatController {
+
+    private final SimpMessagingTemplate messagingTemplate;
+    private final GroupRepository groupRepository;
+    private final UserRepository userRepository;
+    private final GroupMessageRepository groupMessageRepository;
+    private final GroupMemberRepository groupMemberRepository;
+
+
+
+    public GroupChatController(SimpMessagingTemplate messagingTemplate,
+                               GroupRepository groupRepository,
+                               UserRepository userRepository,
+                               GroupMessageRepository groupMessageRepository
+                               , GroupMemberRepository groupMemberRepository) {
+        this.messagingTemplate = messagingTemplate;
+        this.groupRepository = groupRepository;
+        this.userRepository = userRepository;
+        this.groupMessageRepository = groupMessageRepository;
+        this.groupMemberRepository = groupMemberRepository;
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<?> createGroup(@RequestBody CreateGroupDTO dto) {
+        if(dto.getGroupName() == null || dto.getGroupName().isEmpty()) {
+            return ResponseEntity.badRequest().body("Group name cannot be empty");
+        }
+
+        Group group = new Group();
+        group.setName(dto.getGroupName());
+        User creator = userRepository.findByUsername(dto.getCreatedBy())
+                .orElseThrow(() -> new RuntimeException("Creator not found: " + dto.getCreatedBy()));
+        group.setCreatedBy(creator);
+        groupRepository.save(group);
+
+        for(String username : dto.getMemberUsernames()){
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found: " + username));
+            GroupMember gm= new GroupMember();
+            gm.setUser(user);
+            gm.setGroup(group);
+            gm.setAdmin(dto.getCreatedBy().equals(username));
+            groupMemberRepository.save(gm);
+        }
+
+        GroupMessage systemMessage = new GroupMessage();
+        systemMessage.setGroup(group);
+        systemMessage.setSender(null);
+        systemMessage.setMessage("Group created by " + dto.getCreatedBy());
+        systemMessage.setTimestamp(java.time.LocalDateTime.now());
+        groupMessageRepository.save(systemMessage);
+
+        GroupMessageDTO sysMsgDTO = new GroupMessageDTO();
+        sysMsgDTO.setGroupId(group.getId());
+        sysMsgDTO.setSender("Sender");
+        sysMsgDTO.setMessage("Group created by " + dto.getCreatedBy());
+
+
+        messagingTemplate.convertAndSend("/topic/group/" + group.getId(), sysMsgDTO);
+
+        return ResponseEntity.ok("Group created with ID: " + group.getId());
+    }
+
+    @MessageMapping("/groupMessage")
+    public void handleGroupMessage(GroupMessageDTO groupMessageDTO) {
+
+        Group group = groupRepository.findById(groupMessageDTO.getGroupId())
+                .orElseThrow(() -> new RuntimeException("Group not found"));
+        User sender = userRepository.findByUsername(groupMessageDTO.getSender())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        boolean isMember =  groupMemberRepository.existsByGroupAndUser(group, sender);
+        if (!isMember) {
+            throw new RuntimeException("User is not a member of the group");
+        }
+
+        GroupMessage groupMessage = new GroupMessage();
+        groupMessage.setGroup(group);
+        groupMessage.setSender(sender);
+        groupMessage.setMessage(groupMessageDTO.getMessage());
+        groupMessage.setTimestamp(java.time.LocalDateTime.now());
+
+        groupMessageRepository.save(groupMessage);
+
+        messagingTemplate.convertAndSend("/topic/group/" + group.getId(), groupMessageDTO);
+    }
+}

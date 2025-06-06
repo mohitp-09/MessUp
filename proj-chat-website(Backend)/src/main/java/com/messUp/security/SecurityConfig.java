@@ -18,6 +18,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
+import java.util.List;
+
 @Configuration(proxyBeanMethods = false)
 public class SecurityConfig {
 
@@ -36,10 +38,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .cors(Customizer.withDefaults())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/auth/**").permitAll()
+                    .requestMatchers("/api/auth/**","/chat/**").permitAll()
                     .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
@@ -71,7 +73,7 @@ public class SecurityConfig {
         return request -> {
             CorsConfiguration config = new CorsConfiguration();
             config.setAllowCredentials(true);
-            config.addAllowedOrigin("http://localhost:3000");
+            config.setAllowedOriginPatterns(List.of("http://localhost:3000", "http://127.0.0.1:5501"));
             config.addAllowedHeader("*");
             config.addAllowedMethod("*");
             return config;

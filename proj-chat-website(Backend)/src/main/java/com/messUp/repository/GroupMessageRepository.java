@@ -1,4 +1,8 @@
 package com.messUp.repository;
 
-public interface GroupMessageRepository {
+import com.messUp.entity.GroupMessage;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface GroupMessageRepository extends JpaRepository<GroupMessage, Long> {
+
 }
