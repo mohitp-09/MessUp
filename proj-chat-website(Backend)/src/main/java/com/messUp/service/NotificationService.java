@@ -1,0 +1,49 @@
+package com.messUp.service;
+
+import com.messUp.entity.Notification;
+import com.messUp.entity.User;
+import com.messUp.repository.NotificationRepository;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class NotificationService {
+
+    private final NotificationRepository notificationRepository;
+    private final SimpMessagingTemplate simpMessagingTemplate;
+
+    public NotificationService(NotificationRepository notificationRepository, SimpMessagingTemplate simpMessagingTemplate) {
+        this.notificationRepository = notificationRepository;
+        this.simpMessagingTemplate = simpMessagingTemplate;
+    }
+
+    public void setNotification(User recipient,String type, String content) {
+
+        Notification notification = new Notification();
+        notification.setRecipient(recipient);
+        notification.setType(type);
+        notification.setContent(content);
+        notification.setIsRead(false);
+        notificationRepository.save(notification);
+
+
+        simpMessagingTemplate.convertAndSendToUser(
+                recipient.getUsername(),
+                "/queue/notifications",
+                notification
+        );
+    }
+
+    public List<Notification> getUnReadNotifications(User user){
+        return notificationRepository.findByRecipientAndIsReadFalse(user);
+    }
+
+    public void markNotificationAsRead(Long notificationId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new RuntimeException("Notification not found"));
+        notification.setIsRead(true);
+        notificationRepository.save(notification);
+    }
+}

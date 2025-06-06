@@ -1,0 +1,13 @@
+package com.messUp.repository;
+
+import com.messUp.entity.Friendship;
+import com.messUp.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
+    boolean existsByUser1AndUser2(User user1, User user2);
+    boolean existsByUser2AndUser1(User user1, User user2);
+    List<Friendship> findByUser1OrUser2(User user1,User user2);
+}
