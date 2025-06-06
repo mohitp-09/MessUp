@@ -5,11 +5,9 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class PrivateMessageDTO {
-
-    private String message;
+public class GroupMessageDTO {
+    private Long groupId;
     private String sender;
-    private String receiver;
+    private String message;
     private LocalDateTime timestamp;
-
 }

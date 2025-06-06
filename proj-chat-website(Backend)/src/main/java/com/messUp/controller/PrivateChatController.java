@@ -37,6 +37,8 @@ public class PrivateChatController {
 
         privateMessageRepository.save(privateMessage);
 
+        privateMessageDTO.setTimestamp(privateMessage.getTimestamp());
+
         messagingTemplate.convertAndSendToUser(privateMessageDTO.getReceiver(), "/private", privateMessageDTO);
     }
 }
