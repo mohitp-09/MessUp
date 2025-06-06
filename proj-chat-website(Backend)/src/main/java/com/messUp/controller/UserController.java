@@ -3,10 +3,7 @@ package com.messUp.controller;
 import com.messUp.DTO.UserDTO;
 import com.messUp.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
@@ -21,6 +18,13 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUser(@PathVariable  Long id) {
         UserDTO user = userService.getUser(id);
+        return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<UserDTO> searchUser(@RequestParam(required = false) String username,
+                                              @RequestParam(required = false) String email) {
+        UserDTO user = userService.searchUser(username,email);
         return ResponseEntity.ok(user);
     }
 }
