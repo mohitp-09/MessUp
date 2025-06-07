@@ -3,6 +3,7 @@ package com.messUp.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.messUp.entity.FriendRequest;
+import com.messUp.entity.Friendship;
 import com.messUp.entity.Notification;
 import com.messUp.entity.User;
 import com.messUp.repository.FriendRequestRepository;
@@ -11,7 +12,9 @@ import com.messUp.repository.NotificationRepository;
 import com.messUp.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -79,6 +82,13 @@ public class FriendService {
 
         request.setStatus(FriendRequest.Status.ACCEPTED);
         friendRequestRepository.save(request);
+
+        Friendship friendship = new Friendship();
+        friendship.setUser1(request.getSender());
+        friendship.setUser2(request.getReceiver());
+        friendship.setCreatedAt(LocalDateTime.now());
+        friendshipRepository.save(friendship);
+
         return "Friend request accepted successfully.";
     }
 
@@ -87,7 +97,15 @@ public class FriendService {
                 .orElseThrow(() -> new RuntimeException("Friend request not found"));
 
         request.setStatus(FriendRequest.Status.REJECTED);
+        
         friendRequestRepository.save(request);
         return "Friend request rejected successfully.";
+    }
+
+    public List<User> getAllFriends(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return friendshipRepository.findFriendsOfUser(user);
     }
 }
