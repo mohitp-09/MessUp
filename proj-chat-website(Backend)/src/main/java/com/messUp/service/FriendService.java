@@ -1,9 +1,11 @@
 package com.messUp.service;
 
 import com.messUp.entity.FriendRequest;
+import com.messUp.entity.Notification;
 import com.messUp.entity.User;
 import com.messUp.repository.FriendRequestRepository;
 import com.messUp.repository.FriendshipRepository;
+import com.messUp.repository.NotificationRepository;
 import com.messUp.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -13,13 +15,17 @@ public class FriendService {
     private final UserRepository userRepository;
     private final FriendRequestRepository friendRequestRepository;
     private final FriendshipRepository friendshipRepository;
+    private final NotificationRepository notificationRepository;
+    private final NotificationService notificationService;
 
     public FriendService(UserRepository userRepository,
                          FriendRequestRepository friendRequestRepository,
-                         FriendshipRepository friendshipRepository) {
+                         FriendshipRepository friendshipRepository,NotificationRepository notificationRepository,NotificationService notificationService) {
         this.userRepository = userRepository;
         this.friendRequestRepository = friendRequestRepository;
         this.friendshipRepository = friendshipRepository;
+        this.notificationRepository = notificationRepository;
+        this.notificationService = notificationService;
     }
 
     public String sendFriendRequest(String senderUsername, String receiverUsername) {
@@ -46,6 +52,9 @@ public class FriendService {
         friendRequest.setReceiver(receiver);
         friendRequest.setStatus(FriendRequest.Status.PENDING);
         friendRequestRepository.save(friendRequest);
+
+        notificationService.setNotification(receiver, Notification.Type.FRIEND_REQUEST,
+                sender.getUsername() + " has sent you a friend request.");
 
         return "Friend request sent successfully.";
     }

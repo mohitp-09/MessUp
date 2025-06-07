@@ -16,8 +16,9 @@ public class Notification {
     @ManyToOne
     private User recipient;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String type;
+    private Type type;
 
     @Column(columnDefinition = "TEXT")
     private String content;
@@ -25,4 +26,11 @@ public class Notification {
     private Boolean isRead = false;
 
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    public enum Type {
+        FRIEND_REQUEST,
+        MESSAGE,
+        GROUP_INVITATION,
+        OTHER
+    }
 }

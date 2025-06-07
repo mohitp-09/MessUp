@@ -19,7 +19,7 @@ public class NotificationService {
         this.simpMessagingTemplate = simpMessagingTemplate;
     }
 
-    public void setNotification(User recipient,String type, String content) {
+    public void setNotification(User recipient, Notification.Type type, String content) {
 
         Notification notification = new Notification();
         notification.setRecipient(recipient);
@@ -35,6 +35,7 @@ public class NotificationService {
                 notification
         );
     }
+
 
     public List<Notification> getUnReadNotifications(User user){
         return notificationRepository.findByRecipientAndIsReadFalse(user);
