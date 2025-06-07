@@ -1,5 +1,6 @@
 package com.messUp.DTO;
 
+import com.messUp.entity.PrivateMessage;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -10,6 +11,8 @@ public class PrivateMessageDTO {
     private String message;
     private String sender;
     private String receiver;
+    private String mediaUrl;
+    private PrivateMessage.MediaType mediaType = PrivateMessage.MediaType.TEXT;
     private LocalDateTime timestamp;
 
 }
