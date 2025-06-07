@@ -1,19 +1,22 @@
 package com.messUp.controller;
 
+import com.messUp.repository.UserRepository;
 import com.messUp.service.FriendService;
+import com.messUp.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/friends")
 public class FriendController {
     private final FriendService friendService;
+    private final UserService userService;
 
-    public FriendController(FriendService friendService) {
+    public FriendController(FriendService friendService, UserService userService, UserRepository userRepository) {
         this.friendService = friendService;
+        this.userService = userService;
     }
 
     @PostMapping("/request")
@@ -43,4 +46,14 @@ public class FriendController {
             return ResponseEntity.badRequest().body("Error rejecting friend request: " + e.getMessage());
         }
     }
+
+    @GetMapping("/getAllFriends")
+    public ResponseEntity<?> getAllFriends(Principal principal) {
+        try {
+            String username = principal.getName();
+            Long id = userService.getIdByUsername(username);
+        return ResponseEntity.ok(friendService.getAllFriends(id));
+    } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error retrieving friends: " + e.getMessage());
+        }
 }

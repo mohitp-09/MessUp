@@ -44,4 +44,10 @@ public class UserService {
         userDTO.setProfilePicture(user.getProfilePicture());
         return userDTO;
     }
+
+    public Long getIdByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .map(User::getId)
+                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
+    }
 }
