@@ -19,11 +19,10 @@ public class NotificationService {
         this.simpMessagingTemplate = simpMessagingTemplate;
     }
 
-    public void setNotification(User recipient, Notification.Type type, String content, Long referenceId) {
+    public void setNotification(User recipient, Notification.Type type, String content) {
 
         Notification notification = new Notification();
         notification.setRecipient(recipient);
-        notification.setReferenceId(referenceId);
         notification.setType(type);
         notification.setContent(content);
         notification.setIsRead(false);

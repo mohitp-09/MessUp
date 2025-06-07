@@ -34,4 +34,11 @@ public class NotificationController {
         notificationService.markNotificationAsRead(id);
         return ResponseEntity.ok("Notification marked as read.");
     }
+
+    @GetMapping("/all")
+    public List<Notification> getAllNotifications(Principal principal) {
+        User user = userRepository.findByUsername(principal.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return notificationService.getAllNotifications(user);
+    }
 }

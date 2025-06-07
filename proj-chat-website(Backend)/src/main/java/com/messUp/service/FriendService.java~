@@ -54,7 +54,7 @@ public class FriendService {
         friendRequestRepository.save(friendRequest);
 
         notificationService.setNotification(receiver, Notification.Type.FRIEND_REQUEST,
-                sender.getUsername() + " has sent you a friend request.",sender.getId());
+                sender.getUsername() + " has sent you a friend request.");
 
         return "Friend request sent successfully.";
     }

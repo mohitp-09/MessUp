@@ -16,6 +16,8 @@ public class Notification {
     @ManyToOne
     private User recipient;
 
+    private Long referenceId;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Type type;
