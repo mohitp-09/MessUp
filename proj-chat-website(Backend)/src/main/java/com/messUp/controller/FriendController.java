@@ -57,3 +57,4 @@ public class FriendController {
             return ResponseEntity.badRequest().body("Error retrieving friends: " + e.getMessage());
         }
 }
+}
