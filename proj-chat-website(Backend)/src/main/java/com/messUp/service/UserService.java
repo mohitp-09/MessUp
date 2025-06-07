@@ -50,4 +50,11 @@ public class UserService {
                 .map(User::getId)
                 .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
     }
+
+    public void updateProfilePicture(Long userId, String imageUrl) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+        user.setProfilePicture(imageUrl);
+        userRepository.save(user);
+    }
 }

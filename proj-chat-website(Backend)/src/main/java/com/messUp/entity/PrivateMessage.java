@@ -23,6 +23,16 @@ public class PrivateMessage {
     @Column(columnDefinition = "TEXT")
     private String message;
 
+    @Column(columnDefinition = "TEXT", nullable = true)
+    private String mediaUrl;
+
+    @Enumerated(EnumType.STRING)
+    private MediaType mediaType;
+
+    public enum MediaType {
+       TEXT, IMAGE, VIDEO, AUDIO,NONE
+    }
+
     private LocalDateTime timestamp = LocalDateTime.now();
 
 }
