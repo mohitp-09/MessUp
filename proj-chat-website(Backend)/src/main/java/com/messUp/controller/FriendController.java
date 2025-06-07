@@ -1,5 +1,6 @@
 package com.messUp.controller;
 
+import com.messUp.DTO.FriendStatusDTO;
 import com.messUp.repository.UserRepository;
 import com.messUp.service.FriendService;
 import com.messUp.service.UserService;
@@ -22,12 +23,13 @@ public class FriendController {
     @PostMapping("/request")
     public ResponseEntity<?> sendFriendRequest(@RequestParam String senderUsername, @RequestParam String receiverUsername) {
         try {
-            friendService.sendFriendRequest(senderUsername, receiverUsername);
-            return ResponseEntity.ok("Friend request sent successfully.");
+            FriendStatusDTO response = friendService.sendFriendRequest(senderUsername, receiverUsername);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error sending friend request: " + e.getMessage());
         }
     }
+
     @PostMapping("/accept")
     public ResponseEntity<?> acceptFriendRequest(@RequestParam Long requestId) {
         try {
@@ -37,6 +39,7 @@ public class FriendController {
             return ResponseEntity.badRequest().body("Error accepting friend request: " + e.getMessage());
         }
     }
+
     @PostMapping("/reject")
     public ResponseEntity<?> rejectFriendRequest(@RequestParam Long requestId) {
         try {
@@ -52,8 +55,9 @@ public class FriendController {
         try {
             String username = principal.getName();
             Long id = userService.getIdByUsername(username);
-        return ResponseEntity.ok(friendService.getAllFriends(id));
-    } catch (Exception e) {
+            return ResponseEntity.ok(friendService.getAllFriends(id));
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error retrieving friends: " + e.getMessage());
         }
+    }
 }

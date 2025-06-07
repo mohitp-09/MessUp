@@ -2,6 +2,7 @@ package com.messUp.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.messUp.DTO.FriendStatusDTO;
 import com.messUp.entity.FriendRequest;
 import com.messUp.entity.Friendship;
 import com.messUp.entity.Notification;
@@ -36,9 +37,13 @@ public class FriendService {
         this.notificationService = notificationService;
     }
 
-    public String sendFriendRequest(String senderUsername, String receiverUsername) throws JsonProcessingException {
+    public FriendStatusDTO sendFriendRequest(String senderUsername, String receiverUsername) throws JsonProcessingException {
+
+        FriendStatusDTO response = new FriendStatusDTO();
+
         if(senderUsername.equals(receiverUsername)) {
-            return "You cannot send a friend request to yourself.";
+            response.setCanSendRequest(false);
+            return response;
         }
 
         User sender = userRepository.findByUsername(senderUsername)
@@ -46,13 +51,18 @@ public class FriendService {
         User receiver = userRepository.findByUsername(receiverUsername)
                 .orElseThrow(() -> new RuntimeException("Receiver not found"));
 
+
         if (friendshipRepository.existsByUser1AndUser2(sender, receiver) ||
             friendshipRepository.existsByUser2AndUser1(sender, receiver)) {
-            return "You are already friends with this user.";
+            response.setCanSendRequest(false);
+            response.setFriend(true);
+            return response;
         }
 
         if(friendRequestRepository.findBySenderAndReceiverOrReceiverAndSender(sender, receiver, receiver, sender).isPresent()) {
-            throw new RuntimeException("Friend request already exists between these users.");
+            response.setCanSendRequest(false);
+            response.setRequestPending(true);
+            return response;
         }
 
         FriendRequest friendRequest = new FriendRequest();
@@ -73,7 +83,8 @@ public class FriendService {
         notificationService.setNotification(receiver, Notification.Type.FRIEND_REQUEST,
                 sender.getUsername() + " has sent you a friend request.",sender.getId(),metadataJSON);
 
-        return "Friend request sent successfully.";
+        response.setCanSendRequest(false);
+        return response;
     }
 
     public String acceptFriendRequest(Long requestId) {
@@ -97,8 +108,10 @@ public class FriendService {
                 .orElseThrow(() -> new RuntimeException("Friend request not found"));
 
         request.setStatus(FriendRequest.Status.REJECTED);
-        
         friendRequestRepository.save(request);
+
+        friendRequestRepository.delete(request);
+
         return "Friend request rejected successfully.";
     }
 
