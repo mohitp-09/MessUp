@@ -1,12 +1,15 @@
 package com.messUp.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.messUp.entity.Notification;
 import com.messUp.entity.User;
 import com.messUp.repository.NotificationRepository;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class NotificationService {
@@ -19,13 +22,14 @@ public class NotificationService {
         this.simpMessagingTemplate = simpMessagingTemplate;
     }
 
-    public void setNotification(User recipient, Notification.Type type, String content, Long referenceId) {
+    public void setNotification(User recipient, Notification.Type type, String content, Long referenceId, String metadata) {
 
         Notification notification = new Notification();
         notification.setRecipient(recipient);
         notification.setReferenceId(referenceId);
         notification.setType(type);
         notification.setContent(content);
+        notification.setMetadata(metadata);
         notification.setIsRead(false);
         notificationRepository.save(notification);
 

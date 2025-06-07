@@ -1,5 +1,7 @@
 package com.messUp.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.messUp.entity.FriendRequest;
 import com.messUp.entity.Notification;
 import com.messUp.entity.User;
@@ -8,6 +10,9 @@ import com.messUp.repository.FriendshipRepository;
 import com.messUp.repository.NotificationRepository;
 import com.messUp.repository.UserRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class FriendService {
@@ -28,7 +33,7 @@ public class FriendService {
         this.notificationService = notificationService;
     }
 
-    public String sendFriendRequest(String senderUsername, String receiverUsername) {
+    public String sendFriendRequest(String senderUsername, String receiverUsername) throws JsonProcessingException {
         if(senderUsername.equals(receiverUsername)) {
             return "You cannot send a friend request to yourself.";
         }
@@ -53,8 +58,17 @@ public class FriendService {
         friendRequest.setStatus(FriendRequest.Status.PENDING);
         friendRequestRepository.save(friendRequest);
 
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("senderId", sender.getId());
+        metadata.put("receiverId", receiver.getId());
+        metadata.put("requestId", friendRequest.getId());
+
+        String metadataJSON=objectMapper.writeValueAsString(metadata);
+
         notificationService.setNotification(receiver, Notification.Type.FRIEND_REQUEST,
-                sender.getUsername() + " has sent you a friend request.",sender.getId());
+                sender.getUsername() + " has sent you a friend request.",sender.getId(),metadataJSON);
 
         return "Friend request sent successfully.";
     }

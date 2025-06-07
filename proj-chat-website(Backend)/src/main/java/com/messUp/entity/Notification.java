@@ -18,6 +18,9 @@ public class Notification {
 
     private Long referenceId;
 
+    @Column(columnDefinition = "TEXT")
+    private String metadata;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Type type;
