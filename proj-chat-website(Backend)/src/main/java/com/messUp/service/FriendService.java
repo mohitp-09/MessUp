@@ -14,6 +14,7 @@ import com.messUp.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -119,6 +120,17 @@ public class FriendService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return friendshipRepository.findFriendsOfUser(user);
+        List<Friendship> friendships = friendshipRepository.findByUser1OrUser2(user, user);
+
+        List<User> friends = new ArrayList<>();
+        for (Friendship friendship : friendships) {
+            if (friendship.getUser1().getId().equals(id)) {
+                friends.add(friendship.getUser2());
+            } else {
+                friends.add(friendship.getUser1());
+            }
+        }
+
+        return friends;
     }
 }
