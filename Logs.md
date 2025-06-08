@@ -38,3 +38,25 @@
 ## 03/04/2025
 **Harsh**
 - WebSocket setup(Backend)
+
+## 06/06/2025
+**Harsh**
+- Private Messaging Implemented
+- Group Messaging Implemented
+- Group Creation Implemented
+- Notification Feature Implemented
+- Friend Request Feature Implemented
+
+**Mohit**
+- Notification frontend Implementation
+
+## 07/06/2025
+**Harsh**
+- Media Upload Feature Implemented
+- Chat History Feature Implemented
+
+**Mohit**
+- Friend Relation Established in Frontend
+- WebSocket frontend Implementation(In Progress)
+
+
