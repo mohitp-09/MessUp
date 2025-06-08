@@ -13,6 +13,7 @@ public class PrivateMessageDTO {
     private String receiver;
     private String mediaUrl;
     private PrivateMessage.MediaType mediaType = PrivateMessage.MediaType.TEXT;
+    private PrivateMessage.MessageStatus status = PrivateMessage.MessageStatus.SENT;
     private LocalDateTime timestamp;
 
 }

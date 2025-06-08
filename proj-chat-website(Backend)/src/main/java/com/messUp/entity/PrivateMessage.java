@@ -33,6 +33,13 @@ public class PrivateMessage {
        TEXT, IMAGE, VIDEO, AUDIO,NONE
     }
 
+    @Enumerated(EnumType.STRING)
+    private MessageStatus status = MessageStatus.SENT;
+
+    public enum MessageStatus {
+        SENT, DELIVERED, READ
+    }
+
     private LocalDateTime timestamp = LocalDateTime.now();
 
 }

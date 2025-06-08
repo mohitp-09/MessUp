@@ -1,6 +1,7 @@
 package com.messUp.controller;
 
 import com.messUp.DTO.PrivateMessageDTO;
+import com.messUp.DTO.ReadReceiptDTO;
 import com.messUp.entity.PrivateMessage;
 import com.messUp.entity.User;
 import com.messUp.repository.PrivateMessageRepository;
@@ -41,6 +42,7 @@ public class PrivateChatController {
         privateMessage.setMessage(privateMessageDTO.getMessage());
         privateMessage.setMediaUrl(privateMessageDTO.getMediaUrl());
         privateMessage.setMediaType(privateMessageDTO.getMediaType());
+        privateMessage.setStatus(PrivateMessage.MessageStatus.SENT);
         privateMessage.setTimestamp(java.time.LocalDateTime.now());
 
         privateMessageRepository.save(privateMessage);
@@ -48,6 +50,19 @@ public class PrivateChatController {
         privateMessageDTO.setTimestamp(privateMessage.getTimestamp());
 
         messagingTemplate.convertAndSendToUser(privateMessageDTO.getReceiver(), "/private", privateMessageDTO);
+
+        privateMessage.setStatus(PrivateMessage.MessageStatus.DELIVERED);
+        privateMessageRepository.save(privateMessage);
+    }
+
+    @MessageMapping("/markAsRead")
+    public void markAsReead(ReadReceiptDTO readReceiptDTO) {
+        privateMessageRepository.findById(readReceiptDTO.getMessageId())
+                .ifPresent(privateMessage -> {
+                    privateMessage.setStatus(PrivateMessage.MessageStatus.READ);
+                    privateMessageRepository.save(privateMessage);
+                    messagingTemplate.convertAndSendToUser(privateMessage.getSender().getUsername(), "/private/read-receipts", readReceiptDTO);
+                });
     }
 
     @GetMapping("chat/{username}")
