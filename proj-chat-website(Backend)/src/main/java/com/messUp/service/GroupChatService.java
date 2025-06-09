@@ -52,7 +52,11 @@ public class GroupChatService {
         GroupMessageDTO dto = new GroupMessageDTO();
         dto.setId(groupMessage.getId());
         dto.setGroupId(groupMessage.getGroup().getId());
-        dto.setSender(groupMessage.getSender().getUsername());
+        if (groupMessage.getSender() != null) {
+            dto.setSender(groupMessage.getSender().getUsername());
+        } else {
+            dto.setSender("System");
+        }
         dto.setMessage(groupMessage.getMessage());
         dto.setTimestamp(groupMessage.getTimestamp());
         return dto;
