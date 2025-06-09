@@ -13,7 +13,6 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
     boolean existsByUser2AndUser1(User user1, User user2);
     List<Friendship> findByUser1OrUser2(User user1,User user2);
 
-    @Query("SELECT CASE WHEN f.user1 = :user THEN f.user2 ELSE f.user1 END " +
-            "FROM Friendship f WHERE f.user1 = :user OR f.user2 = :user")
-    List<User> findFriendsOfUser(@Param("user") User currentUser);
+    @Query("SELECT f FROM Friendship f WHERE f.user1 = :user OR f.user2 = :user")
+    List<Friendship> findFriendsOfUser(@Param("user") User currentUser);
 }
