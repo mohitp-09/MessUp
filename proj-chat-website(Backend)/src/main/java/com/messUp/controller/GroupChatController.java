@@ -50,8 +50,14 @@ public class GroupChatController {
         return ResponseEntity.ok(groupChatService.getMessagesForGroup(groupId));
     }
 
+
     @GetMapping("/getGroups")
     public ResponseEntity<?> getGroups(Principal principal) {
         return ResponseEntity.ok(groupChatService.getGroupsOfUser(principal.getName()));
+    }
+
+    @GetMapping("/getGroupMembers/{groupId}")
+    public ResponseEntity<?> getGroupMembers(@PathVariable Long groupId) {
+        return ResponseEntity.ok(groupChatService.getMembersOfGroup(groupId));
     }
 }

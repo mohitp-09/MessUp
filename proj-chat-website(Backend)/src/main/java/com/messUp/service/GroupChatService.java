@@ -2,6 +2,7 @@ package com.messUp.service;
 
 import com.messUp.DTO.CreateGroupDTO;
 import com.messUp.DTO.GroupDTO;
+import com.messUp.DTO.GroupMemberDTO;
 import com.messUp.DTO.GroupMessageDTO;
 import com.messUp.entity.Group;
 import com.messUp.entity.GroupMember;
@@ -126,5 +127,21 @@ public class GroupChatService {
         return memberships.stream()
                 .map(GroupMember::getGroup)
                 .toList();
+    }
+
+    public List<GroupMemberDTO> getMembersOfGroup(Long groupId) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new RuntimeException("Group not found"));
+
+        List<GroupMember> members = groupMemberRepository.findByGroup(group);
+        return members.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    private GroupMemberDTO convertToDTO(GroupMember groupMember) {
+        GroupMemberDTO dto = new GroupMemberDTO();
+        dto.setUsername(groupMember.getUser().getUsername());
+        dto.setAdmin(groupMember.isAdmin());
+        dto.setJoinedAt(groupMember.getJoinedAt());
+        return dto;
     }
 }
