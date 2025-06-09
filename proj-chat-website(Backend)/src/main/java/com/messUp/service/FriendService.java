@@ -135,7 +135,17 @@ public class FriendService {
     }
 
     public List<User> getFriends(User currentUser) {
-        List<User> friends = friendshipRepository.findFriendsOfUser(currentUser);
+        List<Friendship> friendships = friendshipRepository.findFriendsOfUser(currentUser);
+        List<User> friends = new ArrayList<>();
+
+        for (Friendship friendship : friendships) {
+            if (friendship.getUser1().equals(currentUser)) {
+                friends.add(friendship.getUser2());
+            } else {
+                friends.add(friendship.getUser1());
+            }
+        }
+
         if (friends.isEmpty()) {
             throw new RuntimeException("No friends found for user: " + currentUser.getUsername());
         }
