@@ -5,8 +5,11 @@ import com.messUp.entity.GroupMember;
 import com.messUp.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> {
     boolean existsByGroupAndUser(Group group, User sender);
+
+    List<GroupMember> findByUser(User user);
 }

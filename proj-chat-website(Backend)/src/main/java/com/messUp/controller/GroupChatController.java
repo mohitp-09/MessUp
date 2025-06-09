@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.security.Principal;
+
 @Controller
 public class GroupChatController {
     private final GroupChatService groupChatService;
@@ -46,5 +48,10 @@ public class GroupChatController {
     public ResponseEntity<?> getGroupMessages(@PathVariable Long groupId) {
 
         return ResponseEntity.ok(groupChatService.getMessagesForGroup(groupId));
+    }
+
+    @GetMapping("/getGroups")
+    public ResponseEntity<?> getGroups(Principal principal) {
+        return ResponseEntity.ok(groupChatService.getGroupsOfUser(principal.getName()));
     }
 }
