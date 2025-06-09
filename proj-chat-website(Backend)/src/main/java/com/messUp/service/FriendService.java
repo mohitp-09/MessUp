@@ -133,4 +133,12 @@ public class FriendService {
 
         return friends;
     }
+
+    public List<User> getFriends(User currentUser) {
+        List<User> friends = friendshipRepository.findFriendsOfUser(currentUser);
+        if (friends.isEmpty()) {
+            throw new RuntimeException("No friends found for user: " + currentUser.getUsername());
+        }
+        return friends;
+    }
 }

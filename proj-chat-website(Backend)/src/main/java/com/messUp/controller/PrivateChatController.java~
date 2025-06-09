@@ -56,7 +56,7 @@ public class PrivateChatController {
     }
 
     @MessageMapping("/markAsRead")
-    public void markAsRead(ReadReceiptDTO readReceiptDTO) {
+    public void markAsReead(ReadReceiptDTO readReceiptDTO) {
         privateMessageRepository.findById(readReceiptDTO.getMessageId())
                 .ifPresent(privateMessage -> {
                     privateMessage.setStatus(PrivateMessage.MessageStatus.READ);
@@ -65,7 +65,7 @@ public class PrivateChatController {
                 });
     }
 
-    @GetMapping("oldChat/{username}")
+    @GetMapping("chat/{username}")
     public ResponseEntity<List<PrivateMessageDTO>> getChatHistory(Principal principal,@PathVariable String username) {
         String currentUsername = principal.getName();
         User user = userRepository.findByUsername(username)
