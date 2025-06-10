@@ -148,4 +148,19 @@ public class GroupChatService {
         dto.setJoinedAt(groupMember.getJoinedAt());
         return dto;
     }
+
+    public void addMemberToGroup(Long groupId, String username) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new RuntimeException("Group not found"));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+        if (groupMemberRepository.existsByGroupAndUser(group, user)) {
+            throw new RuntimeException("User is already a member of the group");
+        }
+        GroupMember groupMember = new GroupMember();
+        groupMember.setGroup(group);
+        groupMember.setUser(user);
+        groupMember.setJoinedAt(java.time.LocalDateTime.now());
+        groupMemberRepository.save(groupMember);
+    }
 }

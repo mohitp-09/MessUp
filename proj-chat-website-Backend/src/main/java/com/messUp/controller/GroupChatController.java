@@ -36,6 +36,12 @@ public class GroupChatController {
         return ResponseEntity.ok("Group created with ID: " + gId);
     }
 
+    @PostMapping("/addMember")
+    public ResponseEntity<?> addMemberToGroup(@RequestParam Long groupId, @RequestParam String username) {
+        groupChatService.addMemberToGroup(groupId, username);
+        return ResponseEntity.ok("Member added to group successfully.");
+    }
+
     @MessageMapping("/groupMessage")
     public void handleGroupMessage(GroupMessageDTO groupMessageDTO) {
 
