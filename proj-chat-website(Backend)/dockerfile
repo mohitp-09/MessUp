@@ -5,7 +5,7 @@ FROM maven:3.8.5-openjdk-17 AS build
 WORKDIR /app
 
 # Copy the project files
-COPY . .
+COPY proj-chat-website(Backend)/app
 
 # Build the application (this will generate the JAR file)
 RUN mvn clean package -DskipTests
