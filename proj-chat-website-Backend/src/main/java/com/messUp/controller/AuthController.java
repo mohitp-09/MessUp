@@ -4,6 +4,9 @@ import com.messUp.DTO.AuthResponse;
 import com.messUp.DTO.LoginRequest;
 import com.messUp.DTO.RegisterRequest;
 import com.messUp.service.AuthService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +28,17 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public AuthResponse login(@RequestBody LoginRequest request) {
-        return authService.login(request);
+    public ResponseEntity<?> login(@RequestBody LoginRequest request,HttpServletResponse response) {
+
+        AuthResponse authResponse = authService.login(request);
+        Cookie cookie = new Cookie("jwt", authResponse.getToken());
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(60 * 60 * 24);
+
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok("Login successful");
     }
 }
