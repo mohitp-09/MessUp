@@ -1,6 +1,9 @@
+import { stringify } from "postcss";
+
 // End-to-End Encryption utilities using Web Crypto API
 class EncryptionService {
-  constructor() {
+  constructor(currentUsername) {
+    this.currentUsername=currentUsername;
     this.keyPair = null;
     this.publicKey = null;
     this.privateKey = null;
@@ -196,32 +199,28 @@ class EncryptionService {
           ["encrypt"]
         );
       }
+      
+      const res = await fetch(`http://localhost:8080/api/keys/get/${username}`);
+      if(!res.ok) throw new Error("Key not found");
+
+      const publicKeyJwk = await res.json();
+      this.contactKeys.set(username,publicKeyJwk);
 
       // Check localStorage
-      const contactKeys = JSON.parse(localStorage.getItem('contactPublicKeys') || '{}');
-      if (contactKeys[username]) {
-        console.log(`🔐 Found ${username}'s key in localStorage`);
+      const stored = JSON.parse(localStorage.getItem('contactPublicKeys') || '{}');
+      stored[username] = publicKeyJwk;
+      localStorage.setItem('contactPublicKeys',JSON.stringify(stored));
 
-        // Store in memory cache for future use
-        this.contactKeys.set(username, contactKeys[username]);
-
-        // Import and return the key
-        return await window.crypto.subtle.importKey(
-          "jwk",
-          contactKeys[username],
-          {
-            name: "RSA-OAEP",
-            hash: "SHA-256",
-          },
-          false,
-          ["encrypt"]
-        );
-      }
-
-      // For demo purposes, if no contact key found, use our own key
-      console.warn(`⚠️ No public key found for ${username}, using own key for demo`);
-      await this.ensureInitialized();
-      return this.publicKey;
+      return await window.crypto.subtle.importKey(
+        "jwk",
+        publicKeyJwk,
+        {
+          name: "RSA-OAEP",
+          hash: "SHA-256",
+        },
+        false,
+        ["encrypt"]
+      );
 
     } catch (error) {
       console.error(`❌ Failed to get contact public key for ${username}:`, error);
@@ -478,7 +477,12 @@ class EncryptionService {
 
   // Check if we have a contact's public key
   hasContactKey(username) {
-    return true; // For demo, always return true
+    return (
+      this.contactKeys.has(username) ||
+      JSON.parse(localStorage.getItem("contactPublicKeys") || "{}")[
+        username
+      ] !== undefined
+    );
   }
 
   // Store contact's public key
@@ -499,7 +503,18 @@ class EncryptionService {
     try {
       console.log(`🔐 Simulating key exchange with ${contactUsername}`);
       const ourPublicKey = await this.getPublicKeyJwk();
-      this.storeContactPublicKey(contactUsername, ourPublicKey);
+
+      const response = await fetch(`http://localhost:8080/api/keys/upload`,{
+        method : "POST",
+        headers : {"Content-Type":"application/json"},
+        body: JSON.stringify({
+          username: this.currentUsername,
+          publicKeyJwk: ourPublicKey
+        }),
+      });
+      if(!response.ok){
+        throw new Error("Failed to upload key");
+      }
       console.log(`🔐 Key exchange completed with ${contactUsername}`);
       return true;
     } catch (error) {
