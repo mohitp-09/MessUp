@@ -5,6 +5,8 @@ import com.messUp.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -18,6 +20,15 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUser(@PathVariable  Long id) {
         UserDTO user = userService.getUser(id);
+        return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/current")
+    public ResponseEntity<UserDTO> getCurrentUser(Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(401).build(); // Unauthorized
+        }
+        UserDTO user = userService.getCurrentUser(principal.getName());
         return ResponseEntity.ok(user);
     }
 
