@@ -6,6 +6,7 @@ import com.messUp.DTO.RegisterRequest;
 import com.messUp.JwtUtils.JwtService;
 import com.messUp.entity.User;
 import com.messUp.repository.UserRepository;
+import jakarta.servlet.http.Cookie;
 import lombok.Data;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -49,6 +50,7 @@ public class AuthService {
         }
 
         String Token = jwtService.generateToken(user);
+
         return new AuthResponse(Token, user.getUsername());
     }
 }
