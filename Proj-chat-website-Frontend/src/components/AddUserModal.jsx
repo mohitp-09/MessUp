@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { X, Search, UserPlus, Loader2, Check } from 'lucide-react';
-import { searchUser, sendFriendRequest } from '../lib/api';
-import { getCurrentUserFromToken } from '../lib/jwtUtils';
+import { searchUser, sendFriendRequest, getCurrentUser } from '../lib/api';
 import toast from 'react-hot-toast';
 
 const AddUserModal = ({ isOpen, onClose }) => {
@@ -18,7 +17,7 @@ const AddUserModal = ({ isOpen, onClose }) => {
     }
 
     setIsSearching(true);
-    setRequestSent(false); // Reset request sent status
+    setRequestSent(false);
     try {
       const user = await searchUser(searchTerm.trim());
       setSearchResult(user);
@@ -35,8 +34,8 @@ const AddUserModal = ({ isOpen, onClose }) => {
 
     setIsSendingRequest(true);
     try {
-      // Get current user's username from JWT token
-      const currentUser = getCurrentUserFromToken();
+      // Get current user from backend
+      const currentUser = await getCurrentUser();
 
       if (!currentUser || !currentUser.username) {
         toast.error('Unable to get current user information. Please try logging in again.');

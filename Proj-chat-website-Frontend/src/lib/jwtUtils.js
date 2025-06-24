@@ -1,70 +1,48 @@
-// JWT utility functions to decode token and extract user information
-export const decodeJWT = (token) => {
+// Cookie-based authentication utilities
+// Since we're using cookies, we need to get user info from the backend
+
+import { getCurrentUser } from './api';
+
+// Get current user from backend (since we're using cookies)
+export const getCurrentUserFromToken = async () => {
   try {
-    if (!token) return null;
-
-    // JWT tokens have 3 parts separated by dots: header.payload.signature
-    const parts = token.split('.');
-    if (parts.length !== 3) {
-      throw new Error('Invalid JWT token format');
-    }
-
-    // Decode the payload (second part)
-    const payload = parts[1];
-
-    // Add padding if needed for base64 decoding
-    const paddedPayload = payload + '='.repeat((4 - payload.length % 4) % 4);
-
-    // Decode base64
-    const decodedPayload = atob(paddedPayload);
-
-    // Parse JSON
-    const parsedPayload = JSON.parse(decodedPayload);
-
-    return parsedPayload;
+    const user = await getCurrentUser();
+    return {
+      username: user.username || user.name,
+      email: user.email,
+      name: user.fullName || user.username,
+      id: user.id,
+    };
   } catch (error) {
-    console.error('Error decoding JWT token:', error);
+    console.error('Error getting user from backend:', error);
     return null;
   }
 };
 
-export const getCurrentUserFromToken = () => {
-  try {
-    const token = localStorage.getItem('token');
-    if (!token) return null;
+// For backward compatibility, create a synchronous version that returns cached data
+let cachedUser = null;
 
-    const decodedToken = decodeJWT(token);
-    if (!decodedToken) return null;
+export const getCurrentUserFromTokenSync = () => {
+  return cachedUser;
+};
 
-    // Extract user information from token
-    // Common JWT claims: sub (subject/username), email, name, etc.
-    const userInfo = {
-      username: decodedToken.sub || decodedToken.username || decodedToken.user,
-      email: decodedToken.email,
-      name: decodedToken.name || decodedToken.fullName,
-      id: decodedToken.userId || decodedToken.id,
-      // Add any other fields your JWT contains
-    };
+// Cache user data when fetched
+export const setCachedUser = (user) => {
+  cachedUser = user;
+};
 
-    return userInfo;
-  } catch (error) {
-    console.error('Error getting user from token:', error);
-    return null;
-  }
+// Clear cached user data
+export const clearCachedUser = () => {
+  cachedUser = null;
+};
+
+// These functions are no longer needed with cookie auth, but kept for compatibility
+export const decodeJWT = (token) => {
+  console.warn('decodeJWT is deprecated with cookie authentication');
+  return null;
 };
 
 export const isTokenExpired = (token) => {
-  try {
-    if (!token) return true;
-
-    const decodedToken = decodeJWT(token);
-    if (!decodedToken || !decodedToken.exp) return true;
-
-    // exp is in seconds, Date.now() is in milliseconds
-    const currentTime = Date.now() / 1000;
-    return decodedToken.exp < currentTime;
-  } catch (error) {
-    console.error('Error checking token expiration:', error);
-    return true;
-  }
+  console.warn('isTokenExpired is deprecated with cookie authentication');
+  return false;
 };

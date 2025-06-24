@@ -149,6 +149,7 @@ class WebSocketService {
     } catch (error) {
       console.error('❌ Failed to send message:', error);
       throw error;
+
     }
   }
 
