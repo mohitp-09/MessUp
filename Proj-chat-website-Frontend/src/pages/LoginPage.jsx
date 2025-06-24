@@ -21,9 +21,12 @@ const LoginPage = () => {
     setIsLoggingIn(true);
 
     try {
-      const response = await login(formData);
-      localStorage.setItem('token', response.token);
-      loginStore(); // Update auth state
+      // Call login API (cookie will be set automatically)
+      await login(formData);
+      
+      // Update auth state
+      await loginStore();
+      
       toast.success('Successfully logged in!');
       navigate('/');
     } catch (error) {

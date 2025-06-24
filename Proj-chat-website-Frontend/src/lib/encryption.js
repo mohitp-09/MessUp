@@ -199,7 +199,7 @@ class EncryptionService {
           ["encrypt"]
         );
       }
-      
+
       const res = await fetch(`http://localhost:8080/api/keys/get/${username}`);
       if(!res.ok) throw new Error("Key not found");
 

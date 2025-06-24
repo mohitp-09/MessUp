@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import groupWebSocketService from "../lib/groupWebSocket";
-import { getCurrentUserFromToken } from "../lib/jwtUtils";
+import { getCurrentUser } from "../lib/api";
 import { getUserGroups, getGroupMessages, getGroupMembers } from "../lib/groupApi";
 
 const useGroupChatStore = create((set, get) => ({
@@ -16,13 +16,14 @@ const useGroupChatStore = create((set, get) => ({
 
   // Initialize Group WebSocket
   initializeGroupWebSocket: async () => {
-    const currentUser = getCurrentUserFromToken();
-    if (!currentUser?.username) {
-      console.error('❌ No username found for group chat');
-      return false;
-    }
-
     try {
+      // Get current user from backend
+      const currentUser = await getCurrentUser();
+      if (!currentUser?.username) {
+        console.error('❌ No username found for group chat');
+        return false;
+      }
+
       set({ currentUser, isLoading: true });
 
       await groupWebSocketService.connect(currentUser.username);
@@ -34,7 +35,6 @@ const useGroupChatStore = create((set, get) => ({
       set({ isConnected: true, isLoading: false });
       console.log('✅ Group WebSocket ready');
 
-      // Load user's groups
       try {
         await get().loadUserGroups();
       } catch (error) {
@@ -56,19 +56,17 @@ const useGroupChatStore = create((set, get) => ({
     set({ isConnected: false });
   },
 
-  // Load user's groups - UPDATED TO USE CORRECT ENDPOINT
+  // Load user's groups
   loadUserGroups: async () => {
     try {
       console.log('🔄 Loading user groups...');
       const userGroups = await getUserGroups();
       console.log('📥 Loaded groups:', userGroups);
 
-      // Ensure userGroups is an array
       const groupsArray = Array.isArray(userGroups) ? userGroups : [];
 
       set({ groups: groupsArray });
 
-      // Subscribe to all groups
       groupsArray.forEach(group => {
         if (group.id) {
           groupWebSocketService.subscribeToGroup(group.id);
@@ -78,14 +76,12 @@ const useGroupChatStore = create((set, get) => ({
       return groupsArray;
     } catch (error) {
       console.error('❌ Failed to load user groups:', error);
-
-      // Set empty array on error
       set({ groups: [] });
       return [];
     }
   },
 
-  // Load group members - NEW FUNCTION
+  // Load group members
   loadGroupMembers: async (groupId) => {
     try {
       console.log('🔄 Loading group members for:', groupId);
@@ -110,7 +106,6 @@ const useGroupChatStore = create((set, get) => ({
   loadOldGroupMessages: async (groupId) => {
     const { loadingOldMessages } = get();
 
-    // Prevent multiple simultaneous loads for the same group
     if (loadingOldMessages[groupId]) {
       return;
     }
@@ -128,7 +123,6 @@ const useGroupChatStore = create((set, get) => ({
 
       console.log('📥 Loaded old group messages:', oldMessages.length);
 
-      // Transform and sort messages by timestamp (oldest first)
       const transformedMessages = Array.isArray(oldMessages) ? oldMessages.map((msg, index) => ({
         _id: `group-old-${groupId}-${index}-${Date.now()}`,
         senderId: msg.sender || 'System',
@@ -174,18 +168,14 @@ const useGroupChatStore = create((set, get) => ({
   selectGroup: async (group) => {
     set({ selectedGroup: group });
 
-    // Subscribe to this group if not already subscribed
     if (group.id) {
       groupWebSocketService.subscribeToGroup(group.id);
     }
 
-    // Load group members
     await get().loadGroupMembers(group.id);
 
-    // Check if we already have messages for this group
     const { groupMessages } = get();
     if (!groupMessages[group.id] || groupMessages[group.id].length === 0) {
-      // Load old messages if we don't have any
       await get().loadOldGroupMessages(group.id);
     }
   },
@@ -204,7 +194,6 @@ const useGroupChatStore = create((set, get) => ({
     }
 
     try {
-      // Add to local state immediately
       const tempMessage = {
         _id: `temp-group-${Date.now()}`,
         senderId: currentUser.username,
@@ -225,7 +214,6 @@ const useGroupChatStore = create((set, get) => ({
         }
       }));
 
-      // Send via WebSocket
       groupWebSocketService.sendGroupMessage(
         groupId,
         currentUser.username,
@@ -256,7 +244,6 @@ const useGroupChatStore = create((set, get) => ({
     set((state) => {
       const existing = state.groupMessages[groupId] || [];
 
-      // Remove any temp messages with same content from same sender
       const filtered = existing.filter(msg =>
         !(msg.isTemp && msg.text === formattedMessage.text && msg.senderId === formattedMessage.senderId)
       );

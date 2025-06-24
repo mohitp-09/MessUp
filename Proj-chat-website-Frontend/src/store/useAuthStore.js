@@ -1,60 +1,65 @@
 import { create } from "zustand";
-import { getCurrentUserFromToken, isTokenExpired } from "../lib/jwtUtils";
+import { getCurrentUser, logout as apiLogout } from "../lib/api";
 
 const useAuthStore = create((set, get) => ({
-  isAuthenticated: (() => {
-    const token = localStorage.getItem('token');
-    if (!token) return false;
+  isAuthenticated: false,
+  user: null,
+  isLoading: false,
 
-    // Check if token is expired
-    if (isTokenExpired(token)) {
-      // Clean up expired token
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+  // Check authentication status by calling the backend
+  checkAuthStatus: async () => {
+    try {
+      set({ isLoading: true });
+      const user = await getCurrentUser();
+      
+      set({
+        isAuthenticated: true,
+        user: user,
+        isLoading: false
+      });
+      
+      return true;
+    } catch (error) {
+      console.log('Not authenticated or session expired');
+      set({
+        isAuthenticated: false,
+        user: null,
+        isLoading: false
+      });
       return false;
     }
-
-    return true;
-  })(),
-
-  user: (() => {
-    const token = localStorage.getItem('token');
-    if (token && !isTokenExpired(token)) {
-      return getCurrentUserFromToken();
-    }
-    return null;
-  })(),
-
-  login: (userData) => {
-    // If userData contains a token, decode it to get user info
-    let userInfo = userData;
-    if (userData && userData.token) {
-      const decodedUser = getCurrentUserFromToken();
-      userInfo = { ...userData, ...decodedUser };
-    }
-
-    set({
-      isAuthenticated: true,
-      user: userInfo
-    });
   },
 
-  logout: () => {
+  login: async (userData) => {
+    // After successful login, get the current user data
+    try {
+      const user = await getCurrentUser();
+      set({
+        isAuthenticated: true,
+        user: user
+      });
+    } catch (error) {
+      console.error('Failed to get user data after login:', error);
+      // Still set as authenticated since login was successful
+      set({
+        isAuthenticated: true,
+        user: userData || null
+      });
+    }
+  },
+
+  logout: async () => {
     console.log('Logging out user...');
 
-    // Clear all auth-related data from localStorage
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('authUser');
+    try {
+      // Call backend logout endpoint to clear cookie
+      await apiLogout();
+    } catch (error) {
+      console.error('Backend logout failed:', error);
+      // Continue with frontend logout even if backend fails
+    }
 
-    // Clear any other auth-related items that might exist
-    Object.keys(localStorage).forEach(key => {
-      if (key.includes('auth') || key.includes('token') || key.includes('user')) {
-        localStorage.removeItem(key);
-      }
-    });
-
-    console.log('LocalStorage cleared, updating state...');
+    console.log('Updating state...');
 
     // Update state
     set({
@@ -69,29 +74,19 @@ const useAuthStore = create((set, get) => ({
     set({ user: userData });
   },
 
-  // Method to refresh user data from token
-  refreshUserFromToken: () => {
-    const token = localStorage.getItem('token');
-    if (token && !isTokenExpired(token)) {
-      const userInfo = getCurrentUserFromToken();
-      set({ user: userInfo });
-      return userInfo;
-    } else {
-      // Token expired, logout user
+  // Refresh user data from backend
+  refreshUser: async () => {
+    try {
+      const user = await getCurrentUser();
+      set({ user: user });
+      return user;
+    } catch (error) {
+      console.error('Failed to refresh user data:', error);
+      // If refresh fails, user might be logged out
       get().logout();
       return null;
     }
-  },
-
-  // Check if current session is valid
-  checkAuthStatus: () => {
-    const token = localStorage.getItem('token');
-    if (!token || isTokenExpired(token)) {
-      get().logout();
-      return false;
-    }
-    return true;
   }
 }));
 
-export { useAuthStore }
+export { useAuthStore };

@@ -11,11 +11,8 @@ const Navbar = () => {
     console.log('Logout button clicked');
 
     try {
-      // Call the logout function from store
-      logout();
-
-      // Force a small delay to ensure state updates
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Call the logout function from store (which calls backend)
+      await logout();
 
       // Navigate to login page
       navigate('/login', { replace: true });
@@ -25,7 +22,6 @@ const Navbar = () => {
       console.error('Error during logout:', error);
 
       // Force logout even if there's an error
-      localStorage.clear();
       navigate('/login', { replace: true });
     }
   };

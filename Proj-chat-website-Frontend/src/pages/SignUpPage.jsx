@@ -47,9 +47,12 @@ const SignUpPage = () => {
 
     setIsSigningUp(true);
     try {
-      const response = await register(formData);
-      localStorage.setItem('token', response.token);
-      loginStore(); // Update auth state
+      // Call register API (cookie will be set automatically)
+      await register(formData);
+      
+      // Update auth state
+      await loginStore();
+      
       toast.success('Account created successfully!');
       navigate('/');
     } catch (error) {

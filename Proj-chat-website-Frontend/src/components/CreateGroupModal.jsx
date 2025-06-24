@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Users, Plus, Loader2, Check, Search } from 'lucide-react';
 import { createGroup } from '../lib/groupApi';
-import { getAllFriends } from '../lib/api';
-import { getCurrentUserFromToken } from '../lib/jwtUtils';
+import { getAllFriends, getCurrentUser } from '../lib/api';
 import toast from 'react-hot-toast';
 
 const CreateGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
@@ -61,14 +60,15 @@ const CreateGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
       return;
     }
 
-    const currentUser = getCurrentUserFromToken();
-    if (!currentUser?.username) {
-      toast.error('Unable to get current user information');
-      return;
-    }
-
     setIsCreating(true);
     try {
+      // Get current user from backend
+      const currentUser = await getCurrentUser();
+      if (!currentUser?.username) {
+        toast.error('Unable to get current user information');
+        return;
+      }
+
       // Include current user in the group
       const memberUsernames = [
         currentUser.username,
