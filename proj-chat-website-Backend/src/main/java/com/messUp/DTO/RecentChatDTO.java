@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 @Data
 public class RecentChatDTO {
 
+    private Long messageIid;
     private String username;
     private String profilePicture;
     private String lastMessage;
