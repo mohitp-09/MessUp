@@ -1,5 +1,7 @@
 package com.messUp.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.messUp.DTO.PublicKeyRequest;
 import com.messUp.entity.PublicKey;
 import com.messUp.entity.User;
@@ -14,14 +16,16 @@ public class KeyExchangeController {
 
     private final UserPublicKeyRepository userPublicKeyRepository;
     private final UserRepository userRepository;
+    private final ObjectMapper objectMapper;
 
-    public KeyExchangeController(UserPublicKeyRepository userPublicKeyRepository, UserRepository userRepository) {
+    public KeyExchangeController(UserPublicKeyRepository userPublicKeyRepository, UserRepository userRepository, ObjectMapper objectMapper) {
         this.userPublicKeyRepository = userPublicKeyRepository;
         this.userRepository = userRepository;
+        this.objectMapper = objectMapper;
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<?> uploadPublicKey(@RequestBody PublicKeyRequest request) {
+    public ResponseEntity<?> uploadPublicKey(@RequestBody PublicKeyRequest request) throws JsonProcessingException {
         User user = userRepository.findByUsername(request.getUsername()).orElseThrow(
             () -> new RuntimeException("User not found")
         );
@@ -30,7 +34,9 @@ public class KeyExchangeController {
             .orElse(new PublicKey());
 
         key.setUser(user);
-        key.setPublicKeyJwk(request.getPublicKeyJwk());
+
+        String jwkJson=objectMapper.writeValueAsString(request.getPublicKeyJwk());
+        key.setPublicKeyJwk(jwkJson);
         userPublicKeyRepository.save(key);
         return ResponseEntity.ok("Public key uploaded successfully");
     }
