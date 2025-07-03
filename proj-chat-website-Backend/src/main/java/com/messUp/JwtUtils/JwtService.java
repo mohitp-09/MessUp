@@ -30,28 +30,62 @@ public class JwtService {
                 .compact();
     }
 
+    public String generateRefreshToken(User user){
+        return Jwts.builder()
+                .subject(user.getUsername())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7)) // 7 days
+                .signWith(getSigningKey())
+                .compact();
+    }
+
     public String extractUsername(String token){
-        return Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
+        try {
+            if (token == null || token.trim().isEmpty()) {
+                throw new IllegalArgumentException("JWT token is null or empty");
+            }
+
+            return Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .getSubject();
+        }
+        catch (IllegalArgumentException e) {
+            System.err.println("❌ Token is null or empty: " + e.getMessage());
+        } catch (io.jsonwebtoken.security.SignatureException e) {
+            System.err.println("❌ Invalid JWT signature: " + e.getMessage());
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            System.err.println("❌ JWT token is expired: " + e.getMessage());
+        } catch (io.jsonwebtoken.JwtException e) {
+            System.err.println("❌ JWT parsing failed: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("❌ Unexpected error while extracting username: " + e.getMessage());
+        }
+
+        return null;
     }
 
     public boolean isTokenValid(String token,UserDetails userDetails){
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        String username = extractUsername(token);
+        if (username == null) return false;
+        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {
-           Date expirationDate = Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getExpiration();
+        try {
+            Date expirationDate = Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .getExpiration();
             return expirationDate.before(new Date());
+        } catch (Exception e) {
+            System.err.println("❌ Failed to check token expiration: " + e.getMessage());
+            return true; // Treat unknown/invalid tokens as expired
+        }
     }
 
 }

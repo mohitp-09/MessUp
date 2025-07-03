@@ -50,7 +50,19 @@ public class AuthService {
         }
 
         String Token = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
 
-        return new AuthResponse(Token, user.getUsername());
+        return new AuthResponse(Token, user.getUsername(),refreshToken);
+    }
+
+    public AuthResponse refreshToken(String refreshToken) {
+        String username = jwtService.extractUsername(refreshToken);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String newToken = jwtService.generateToken(user);
+        String newRefreshToken = jwtService.generateRefreshToken(user);
+
+        return new AuthResponse(newToken, user.getUsername(), newRefreshToken);
     }
 }

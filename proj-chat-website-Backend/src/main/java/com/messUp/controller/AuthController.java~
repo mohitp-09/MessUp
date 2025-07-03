@@ -75,21 +75,12 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
-        Cookie jwt = new Cookie("jwt", null);
-        jwt.setHttpOnly(true);
-        jwt.setSecure(true);
-        jwt.setPath("/");
-        jwt.setMaxAge(0);
-
-        Cookie refresh = new Cookie("refreshToken", null);
-        refresh.setHttpOnly(true);
-        refresh.setSecure(true);
-        refresh.setPath("/");
-        refresh.setMaxAge(0);
-
-        response.addCookie(jwt);
-        response.addCookie(refresh);
-
+        Cookie cookie = new Cookie("jwt", null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
         return ResponseEntity.ok("Logout successful");
     }
 }
