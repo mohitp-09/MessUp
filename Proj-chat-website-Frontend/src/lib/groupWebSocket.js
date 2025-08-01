@@ -16,7 +16,7 @@ class GroupWebSocketService {
         console.log('🔌 Connecting Group WebSocket for user:', username);
         this.currentUsername = username;
 
-        const socket = new SockJS('http://localhost:8080/chat');
+        const socket = new SockJS('https://messup.onrender.com/chat');
         this.stompClient = Stomp.over(socket);
 
         // Disable debug to reduce noise
