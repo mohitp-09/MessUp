@@ -180,15 +180,15 @@ const ChatContainer = ({ selectedUser, onClose }) => {
                 <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center animate-bounce shadow-lg border border-primary/20 backdrop-blur-sm">
                   <MessageSquare className="w-10 h-10 text-primary" />
                 </div>
-                <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center">
                   <Shield className="w-3 h-3 text-white" />
                 </div>
                 <Sparkles className="absolute -top-2 -right-2 w-6 h-6 text-primary/60 animate-pulse" />
-                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
+                {/* <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
                   <div className="bg-primary/90 backdrop-blur-sm text-primary-content text-xs font-bold px-3 py-1 rounded-full shadow-lg border border-primary/30">
                     MessUp
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
 
