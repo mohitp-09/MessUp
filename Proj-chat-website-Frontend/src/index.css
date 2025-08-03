@@ -62,13 +62,13 @@
   margin-top: 1rem;
 }
 
-input[type="password"] {
+/* input[type="password"] {
   width: 100%;
   padding: 0.5rem;
   margin-top: 1rem;
   border: 1px solid #ccc;
   border-radius: 4px;
-}
+} */
 
 @layer utilities {
   /* Fade in animations */

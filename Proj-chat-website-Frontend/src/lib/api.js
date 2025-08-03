@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Configure axios with base URL
-const API_BASE_URL = 'https://messup.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -250,7 +250,7 @@ export const getAllFriends = async () => {
 // Create separate axios instances for different services
 const createFriendsApi = () => {
   const friendsApi = axios.create({
-    baseURL: 'https://messup.onrender.com',
+    baseURL: API_BASE_URL,
     headers: {
       'Content-Type': 'application/json',
     },
@@ -264,7 +264,7 @@ const createFriendsApi = () => {
       console.error('Friends API Error:', error);
 
       if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
-        throw new Error('Unable to connect to server. Please ensure the backend is running on https://messup.onrender.com');
+        throw new Error(`Unable to connect to server. Please ensure the backend is running on ${API_BASE_URL}`);
       }
 
       if (error.code === 'ECONNABORTED') {
@@ -280,7 +280,7 @@ const createFriendsApi = () => {
 
 const createNotificationsApi = () => {
   const notificationsApi = axios.create({
-    baseURL: 'https://messup.onrender.com/api',
+    baseURL: `${API_BASE_URL}/api`,
     headers: {
       'Content-Type': 'application/json',
     },
@@ -294,7 +294,7 @@ const createNotificationsApi = () => {
       console.error('Notifications API Error:', error);
 
       if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
-        throw new Error('Unable to connect to server. Please ensure the backend is running on https://messup.onrender.com');
+        throw new Error(`Unable to connect to server. Please ensure the backend is running on ${API_BASE_URL}`);
       }
 
       if (error.code === 'ECONNABORTED') {

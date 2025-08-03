@@ -66,7 +66,7 @@ const SignUpPage = () => {
 
   const handleGoogleSignUp = () => {
     // Redirect to your backend's Google OAuth2 endpoint
-    window.location.href = 'https://messup.onrender.com/oauth2/authorization/google';
+    window.location.href = `${import.meta.env.VITE_BASE_URL}/oauth2/authorization/google`;
   };
 
   return (

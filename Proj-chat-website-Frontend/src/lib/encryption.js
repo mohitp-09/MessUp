@@ -1,5 +1,6 @@
 import { stringify } from "postcss";
 import { usePassphraseStore } from "../store/usePassphraseStore";
+const API_BASE_URL = import.meta.env.VITE_BASE_URL;
 
 // End-to-End Encryption utilities using Web Crypto API
 class EncryptionService {
@@ -87,7 +88,7 @@ class EncryptionService {
       );
 
       // FIXED: Use the same API configuration as other requests
-      const response = await fetch("https://messup.onrender.com/api/keys/upload", {
+      const response = await fetch(`${API_BASE_URL}/api/keys/upload`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -430,7 +431,7 @@ class EncryptionService {
       // Fetch from server
       console.log(`🔐 Fetching ${username}'s key from server...`);
       const res = await fetch(
-        `https://messup.onrender.com/api/keys/get/${username}`,
+        `${API_BASE_URL}/api/keys/get/${username}`,
         {
           credentials: "include",
         }
@@ -469,7 +470,7 @@ class EncryptionService {
 
   async isUserAuthenticated() {
     try {
-      const res = await fetch("https://messup.onrender.com/api/users/current", {
+      const res = await fetch(`${API_BASE_URL}/api/users/current`, {
         credentials: "include",
       });
 
@@ -677,7 +678,7 @@ class EncryptionService {
       password
     );
 
-    await fetch("https://messup.onrender.com/api/keys/upload-private", {
+    await fetch(`${API_BASE_URL}/api/keys/upload-private`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -692,7 +693,7 @@ class EncryptionService {
 
   async tryRestorePrivateKeyFromServer(password) {
     const res = await fetch(
-      `https://messup.onrender.com/api/keys/get-private/${this.currentUsername}`,
+      `${API_BASE_URL}/api/keys/get-private/${this.currentUsername}`,
       { credentials: "include" }
     );
 

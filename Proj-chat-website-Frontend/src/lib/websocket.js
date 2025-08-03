@@ -1,6 +1,7 @@
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
 import encryptionService from './encryption';
+const API_BASE_URL = import.meta.env.VITE_BASE_URL;
 
 class WebSocketService {
   constructor() {
@@ -17,7 +18,7 @@ class WebSocketService {
         console.log('🔌 Connecting WebSocket for user:', username);
         this.currentUsername = username;
 
-        const socket = new SockJS('https://messup.onrender.com/chat');
+        const socket = new SockJS(`${API_BASE_URL}/chat`);
         this.stompClient = Stomp.over(socket);
 
         // Disable debug to reduce noise

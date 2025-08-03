@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Configure axios for group API calls
-const API_BASE_URL = 'https://messup.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const groupApi = axios.create({
   baseURL: API_BASE_URL,
