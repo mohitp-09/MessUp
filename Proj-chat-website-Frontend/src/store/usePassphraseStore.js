@@ -4,9 +4,9 @@ export const usePassphraseStore = create((set) => ({
   showModal: false,
   callback: null,
   error: null,
-  passphrase: null, // ✅ new
-  setPassphrase: (passphrase) => set({ passphrase }), // ✅ new
-  clearPassphrase: () => set({ passphrase: null }), // ✅ new
+  passphrase: null,
+  setPassphrase: (passphrase) => set({ passphrase }),
+  clearPassphrase: () => set({ passphrase: null }),
 
   openModal: (callback) => set({ showModal: true, callback, error: null }),
   closeModal: () => set({ showModal: false, callback: null, error: null }),

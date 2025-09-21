@@ -1,17 +1,17 @@
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import Navbar from "./components/Navbar";
-import HomePage from "./pages/HomePage";
-import SettingsPage from "./pages/SettingsPage";
-import { useThemeStore } from "./store/useThemeStore";
-import ProfilePage from "./pages/ProfilePage";
+import Navbar from "../components/Navbar";
+import HomePage from "../pages/HomePage";
+import SettingsPage from "../pages/SettingsPage";
+import { useThemeStore } from "../store/useThemeStore";
+import ProfilePage from "../pages/ProfilePage";
 import { Toaster } from "react-hot-toast";
-import LoginPage from "./pages/LoginPage";
-import SignUpPage from "./pages/SignUpPage";
-import ProtectedRoute from "./components/ProtectedRoute";
-import { useAuthStore } from "./store/useAuthStore";
-import PassphraseModal from "./components/PassphraseModal";
-import encryptionService from "./lib/encryption";
+import LoginPage from "../pages/LoginPage";
+import SignUpPage from "../pages/SignUpPage";
+import ProtectedRoute from "../components/ProtectedRoute";
+import { useAuthStore } from "../store/useAuthStore";
+import PassphraseModal from "../components/PassphraseModal";
+import encryptionService from "../lib/encryption";
 
 const App = () => {
   const { theme } = useThemeStore();
